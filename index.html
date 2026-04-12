@@ -92,6 +92,7 @@
   .market-box{border-radius:14px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
   .status-bull{background:#EAF4EE;border:1px solid #8ABB9A;}
   .status-bear{background:#F4E4D0;border:1px solid #D4A868;}
+  .status-pending{background:#FDF6E3;border:1px solid #D4C85A;}
   .market-icon{font-size:24px;flex-shrink:0;margin-top:2px;}
   .market-body{flex:1;}
   .market-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:2px;}
@@ -251,13 +252,13 @@
     <p><strong>為什麼只持有 4 檔？</strong>集中火力在動能最強的少數個股上，不分散到平庸的標的。空頭時自動清倉保留現金，不硬撐。</p>
   </div>
 
-  <div class="market-box status-bull">
-    <div class="market-icon">🟢</div>
+  <div class="market-box status-pending">
+    <div class="market-icon">🟡</div>
     <div class="market-body">
-      <div class="market-label">市場狀態</div>
-      <div class="market-status">多頭（SPY 高於 200 日均線）</div>
+      <div class="market-label">策略狀態</div>
+      <div class="market-status">等待多頭確認（SPY 已回到 200MA 上方）</div>
       <div class="market-detail">SPY 收盤 679.46　|　200MA 662.64</div>
-      <div class="market-action">策略正常運作，持有動能最強的個股</div>
+      <div class="market-action">SPY 回到均線之上，策略需連續兩週確認後才恢復持股，目前仍保留現金</div>
     </div>
   </div>
 </section>
