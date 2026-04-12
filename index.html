@@ -134,6 +134,10 @@
   .seg-label{color:#FFFFFF;font-size:10px;font-weight:800;text-align:center;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,0.3);}
   .alloc-dates{display:flex;gap:8px;}
   .alloc-date{flex:1;text-align:center;font-size:10px;color:var(--ink-soft);font-weight:700;}
+  .alloc-phases{display:flex;gap:8px;margin-top:2px;}
+  .alloc-phase{text-align:center;font-size:9px;font-weight:700;letter-spacing:.08em;padding:2px 0;border-radius:4px;}
+  .phase-cash{background:var(--accent-soft);color:var(--accent-deep);}
+  .phase-hold{background:transparent;}
   .alloc-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;}
   .alloc-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-2);font-weight:600;}
   .alloc-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
@@ -153,15 +157,15 @@
 
   /* ===== Desktop ===== */
   @media (min-width:900px) and (hover:hover) and (pointer:fine){
-    html{scroll-snap-type:y mandatory;scroll-behavior:smooth;}
+    html{scroll-snap-type:y proximity;scroll-behavior:smooth;}
     body{font-size:18px;line-height:1.8;}
     .wrap{max-width:none;padding:0;}
 
     .hero,.intro,section{
-      min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+      min-height:100vh;scroll-snap-align:start;
       box-sizing:border-box;margin:0;display:flex;flex-direction:column;justify-content:center;padding:80px 64px;
     }
-    .arrow{scroll-snap-align:none;font-size:24px;margin:0;padding:16px 0;}
+    .arrow{display:none;}
 
     .hero{border-radius:0;padding:96px 64px;}
     .hero > *{max-width:1040px;margin-left:auto;margin-right:auto;width:100%;}
@@ -206,6 +210,7 @@
     .alloc-bars{height:340px;gap:12px;}
     .seg-label{font-size:12px;}
     .alloc-date{font-size:12px;}
+    .alloc-phase{font-size:11px;}
     .alloc-legend{gap:6px 18px;margin-top:10px;}
     .alloc-legend-item{font-size:13px;}
     .alloc-legend-dot{width:12px;height:12px;}
@@ -216,7 +221,7 @@
     .next-rebal strong{font-size:17px;}
 
     footer{
-      min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+      min-height:100vh;scroll-snap-align:start;
       box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
       padding:80px 64px;font-size:14px;margin-top:0;border-top:none;color:var(--muted);
     }
@@ -235,6 +240,7 @@
     <span>S&amp;P 500 選股</span>
     <span>每週輪動</span>
     <span>持有 4 檔</span>
+    <span>資料更新 2026-04-12</span>
   </div>
 </header>
 
@@ -248,7 +254,7 @@
   <h2 class="sec-title">怎麼從 500 支股票挑出 4 支？</h2>
 
   <div class="card explain-card">
-    <p>用 90 天的價格走勢計算「調整斜率」（Adjusted Slope），衡量每支股票的動能強度。斜率越高代表趨勢越強、越穩定。</p>
+    <p>從 S&amp;P 500 成分股中，用 90 天的價格走勢計算每支股票的「動能分數」— 簡單說就是看誰漲得又快又穩。分數最高的 4 檔入選持有，每週三重新計算，強者續抱、弱者換掉。</p>
     <p><strong>為什麼只持有 4 檔？</strong>集中火力在動能最強的少數個股上，不分散到平庸的標的。空頭時自動清倉保留現金，不硬撐。</p>
   </div>
 
@@ -256,9 +262,9 @@
     <div class="market-icon">🟡</div>
     <div class="market-body">
       <div class="market-label">策略狀態</div>
-      <div class="market-status">等待多頭確認（SPY 已回到 200MA 上方）</div>
-      <div class="market-detail">SPY 收盤 679.46　|　200MA 662.64</div>
-      <div class="market-action">SPY 回到均線之上，策略需連續兩週確認後才恢復持股，目前仍保留現金</div>
+      <div class="market-status">等待多頭確認</div>
+      <div class="market-detail">SPY 679.46　|　200 日均線 662.64</div>
+      <div class="market-action">SPY 已回到長期均線之上，策略需連續兩週確認趨勢後才恢復持股，目前仍保留現金</div>
     </div>
   </div>
 </section>
@@ -271,7 +277,7 @@
   <h2 class="sec-title">現在哪支股票跑最快？</h2>
 
   <div class="card">
-    <div class="card-subtitle">依調整斜率（Adjusted Slope）排名，越高代表動能越強</div>
+    <div class="card-subtitle">依動能分數排名 — 分數越高，代表近期漲勢越強、越穩定</div>
     <div class="selection-explain">入選 = 動能排名前 4，納入配置<br>未入選 = 排名較低，暫不持有</div>
 
     <div class="score-row">
@@ -387,11 +393,11 @@
           <div class="alloc-seg" style="height:63px;background:#7A9868;"><span class="seg-label"><b>WDC</b><br>24%</span></div>
           <div class="alloc-seg" style="height:54px;background:#B07840;"><span class="seg-label"><b>MRNA</b><br>21%</span></div>
         </div>        <div class="alloc-col">
-          <div class="alloc-seg alloc-cash" style="height:260px;"><span class="seg-label">全現金</span></div>
+          <div class="alloc-seg alloc-cash" style="height:104px;"><span class="seg-label">全現金</span></div>
         </div>        <div class="alloc-col">
-          <div class="alloc-seg alloc-cash" style="height:260px;"><span class="seg-label">全現金</span></div>
+          <div class="alloc-seg alloc-cash" style="height:104px;"><span class="seg-label">全現金</span></div>
         </div>        <div class="alloc-col">
-          <div class="alloc-seg alloc-cash" style="height:260px;"><span class="seg-label">全現金</span></div>
+          <div class="alloc-seg alloc-cash" style="height:104px;"><span class="seg-label">全現金</span></div>
         </div>
       </div>
       <div class="alloc-dates">
@@ -404,6 +410,10 @@
         <div class="alloc-date">04/01</div>
         <div class="alloc-date">04/08</div>
       </div>
+      <div class="alloc-phases">
+        <div class="alloc-phase phase-hold" style="flex:5;"></div>
+        <div class="alloc-phase phase-cash" style="flex:3;">空頭防禦</div>
+      </div>
       <div class="alloc-legend">
         <div class="alloc-legend-item"><div class="alloc-legend-dot" style="background:#8A5A30;"></div>ALB</div>
         <div class="alloc-legend-item"><div class="alloc-legend-dot" style="background:#A89870;"></div>MU</div>
@@ -412,13 +422,9 @@
         <div class="alloc-legend-item"><div class="alloc-legend-dot" style="background:#B07840;"></div>MRNA</div>
       </div>
     </div>
-
-    <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--line);">
-      <p style="font-size:16.5px;line-height:1.9;margin-bottom:14px;"><strong>個股輪動的核心邏輯</strong></p>
-      <p>從 S&amp;P 500 成分股中，找出動能最強的 4 檔個股集中持有。每週三重新計算排名，強者續抱、弱者換掉。空頭時清空持倉，保留現金等待轉機。</p>
-      <div class="pq">不選產業、直接選個股。用動能找到市場裡跑最快的那幾匹馬。</div>
-    </div>
   </div>
+
+  <div class="pq">不選產業、直接選個股。用動能找到市場裡跑最快的那幾匹馬。</div>
 </section>
 
 <div class="next-rebal">
