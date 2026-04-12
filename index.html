@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2C2018">
+<meta name="format-detection" content="telephone=no">
+<title>美股個股量化動能策略｜Taylor Tam</title>
+<meta name="description" content="從 S&P 500 找出動能最強的個股集中持有。每週系統化輪動。由 Taylor Tam 建置。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tayloryam.github.io/sm/">
+<meta property="og:title" content="美股個股量化動能策略｜Taylor Tam">
+<meta property="og:description" content="從 S&P 500 找出動能最強的個股集中持有。每週系統化輪動。">
+<meta property="og:image" content="https://tayloryam.github.io/sm/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="SM - Stock Momentum">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="美股個股量化動能策略｜Taylor Tam">
+<meta name="twitter:description" content="從 S&P 500 找出動能最強的個股集中持有。每週系統化輪動。">
+<meta name="twitter:image" content="https://tayloryam.github.io/sm/og.png">
+<!-- Last updated: 2026-04-12 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDEAE0;
+    --bg-soft:#E5E1D4;
+    --paper:#FFFFFF;
+    --ink:#2C2018;
+    --ink-2:#4A3A2C;
+    --ink-soft:#6B5438;
+    --muted:#8A7A66;
+    --line:#E0DBCF;
+    --line-2:#D4CCB8;
+    --accent:#B8763A;
+    --accent-deep:#7A4818;
+    --accent-soft:#F4E4D0;
+    --cool:#4A6B82;
+    --cool-soft:#E3EAF1;
+    --chip:#F7F3E9;
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","微軟正黑體",system-ui,-apple-system,sans-serif;
+    color:var(--ink);font-weight:400;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    line-height:1.85;font-size:17px;letter-spacing:.01em;
+  }
+  strong{font-weight:700;}
+  .wrap{max-width:480px;margin:0 auto;padding:0 18px 56px;}
+
+  /* ===== Hero ===== */
+  .hero{
+    margin:0 -18px 28px;padding:44px 22px 38px;
+    background:radial-gradient(120% 80% at 80% 0%,rgba(184,118,58,.28),transparent 60%),linear-gradient(160deg,#2C2018 0%,#4A3624 55%,#7A6448 100%);
+    color:#F5EFE2;position:relative;overflow:hidden;
+  }
+  .hero::after{content:"";position:absolute;inset:auto 0 0 0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,239,226,.35),transparent);}
+  .hero .badge{display:inline-block;font-size:12px;letter-spacing:.18em;padding:6px 12px;border:1px solid rgba(245,239,226,.4);border-radius:999px;color:#E8DCC4;margin-bottom:18px;}
+  .hero h1{margin:0 0 10px;font-size:28px;line-height:1.3;font-weight:900;letter-spacing:.01em;}
+  .hero .sub{margin:0;color:#D8C8AA;font-size:16px;line-height:1.75;}
+  .hero .meta{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#C9B89A;}
+  .hero .meta span{padding:4px 10px;background:rgba(255,255,255,.06);border-radius:6px;}
+
+  /* ===== Section ===== */
+  section{margin-bottom:46px;}
+  .sec-num{display:inline-block;font-size:12px;letter-spacing:.22em;color:var(--accent-deep);font-weight:700;margin-bottom:8px;}
+  .sec-title{margin:0 0 22px;font-size:24px;line-height:1.4;font-weight:700;color:var(--ink);letter-spacing:.005em;}
+
+  /* ===== Intro ===== */
+  .intro{background:var(--paper);border-left:4px solid var(--accent-deep);border-radius:4px 12px 12px 4px;padding:20px 22px;margin-bottom:36px;box-shadow:0 1px 0 var(--line);}
+  .intro p{margin:0 0 12px;color:var(--ink-2);font-size:16.5px;line-height:1.9;}
+  .intro p:last-child{margin-bottom:0;}
+  .intro strong{color:var(--ink);}
+
+  /* ===== Card ===== */
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px 20px 22px;margin-bottom:18px;}
+  .card p{margin:0 0 12px;color:var(--ink-2);line-height:1.85;}
+  .card p:last-child{margin-bottom:0;}
+  .card p strong{color:var(--ink);}
+  .card-subtitle{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px;margin-top:-10px;}
+  .step-intro{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:14px;margin-top:-10px;}
+
+  /* ===== Market status ===== */
+  .market-box{border-radius:14px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+  .status-bull{background:#EAF4EE;border:1px solid #8ABB9A;}
+  .status-bear{background:#F4E4D0;border:1px solid #D4A868;}
+  .market-icon{font-size:24px;flex-shrink:0;margin-top:2px;}
+  .market-body{flex:1;}
+  .market-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:2px;}
+  .market-status{font-size:15px;font-weight:800;color:var(--ink);}
+  .market-detail{font-size:11px;color:var(--muted);margin-top:3px;}
+  .market-action{font-size:12px;color:var(--ink-2);margin-top:6px;font-weight:500;line-height:1.6;}
+
+  /* ===== Arrow ===== */
+  .arrow{text-align:center;font-size:18px;color:var(--muted);margin:6px 0;}
+
+  /* ===== Selection explain ===== */
+  .selection-explain{font-size:13px;font-weight:500;color:var(--accent-deep);background:var(--accent-soft);border-radius:8px;padding:10px 14px;margin-bottom:14px;line-height:1.7;}
+
+  /* ===== Score Bars ===== */
+  .score-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+  .score-rank{font-size:10px;color:var(--muted);width:20px;text-align:center;flex-shrink:0;}
+  .score-label{font-size:12px;color:var(--ink-2);width:42px;text-align:right;flex-shrink:0;font-weight:700;}
+  .score-bar-bg{flex:1;height:22px;background:var(--bg-soft);border-radius:11px;overflow:hidden;}
+  .score-bar{height:100%;border-radius:11px;display:flex;align-items:center;justify-content:flex-end;padding-right:7px;font-size:10px;font-weight:800;color:#FFF;}
+  .score-val{font-size:10px;color:var(--muted);width:40px;text-align:right;flex-shrink:0;font-family:monospace;}
+  .bar-in1{background:linear-gradient(90deg,#3A8A60,#2A6A48);}
+  .bar-in2{background:linear-gradient(90deg,#5AAA80,#3A8A60);}
+  .bar-in3{background:linear-gradient(90deg,#7ABA98,#5AAA80);}
+  .bar-in4{background:linear-gradient(90deg,#98C8AE,#7ABA98);}
+  .bar-out{background:linear-gradient(90deg,#A8A498,#908C84);}
+  .score-tag{font-size:9.5px;font-weight:800;border-radius:6px;padding:2px 5px;flex-shrink:0;}
+  .tag-in{background:#EAF4EE;color:#1A5A38;border:1px solid #8ABB9A;}
+  .tag-out{background:var(--chip);color:var(--muted);border:1px solid var(--line-2);}
+  .score-note{text-align:center;font-size:12px;color:var(--muted);font-weight:500;margin-top:8px;line-height:1.6;}
+  .score-note strong{color:var(--ink);font-weight:800;}
+
+  /* ===== Allocation Chart ===== */
+  .alloc-wrap{display:flex;flex-direction:column;gap:6px;}
+  .alloc-bars{display:flex;align-items:flex-end;gap:8px;height:260px;}
+  .alloc-col{flex:1;height:100%;display:flex;flex-direction:column-reverse;}
+  .alloc-seg{width:100%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1.5px solid #FFFFFF;}
+  .alloc-cash{background:var(--bg-soft) !important;border:1.5px dashed var(--line-2) !important;}
+  .alloc-cash .seg-label{color:var(--muted) !important;text-shadow:none !important;font-size:11px !important;}
+  .seg-label{color:#FFFFFF;font-size:10px;font-weight:800;text-align:center;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,0.3);}
+  .alloc-dates{display:flex;gap:8px;}
+  .alloc-date{flex:1;text-align:center;font-size:10px;color:var(--ink-soft);font-weight:700;}
+  .alloc-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;}
+  .alloc-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-2);font-weight:600;}
+  .alloc-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
+  /* ===== Pull-quote ===== */
+  .pq{margin:14px 0 4px;padding:12px 16px;background:var(--chip);border-radius:8px;font-size:15.5px;color:var(--ink);border-left:3px solid var(--accent);line-height:1.8;}
+
+  /* ===== Next rebalance hint ===== */
+  .next-rebal{margin-top:36px;padding:16px 20px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-align:center;font-size:13px;color:var(--muted);line-height:1.7;}
+  .next-rebal strong{color:var(--ink);font-size:15px;}
+
+  /* ===== Footer ===== */
+  footer{margin-top:24px;padding-top:24px;border-top:1px solid var(--line-2);color:var(--muted);font-size:12px;line-height:1.8;}
+  footer p{margin:4px 0;}
+
+  ::selection{background:var(--accent);color:#fff;}
+
+  /* ===== Desktop ===== */
+  @media (min-width:900px) and (hover:hover) and (pointer:fine){
+    html{scroll-snap-type:y mandatory;scroll-behavior:smooth;}
+    body{font-size:18px;line-height:1.8;}
+    .wrap{max-width:none;padding:0;}
+
+    .hero,.intro,section{
+      min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+      box-sizing:border-box;margin:0;display:flex;flex-direction:column;justify-content:center;padding:80px 64px;
+    }
+    .arrow{scroll-snap-align:none;font-size:24px;margin:0;padding:16px 0;}
+
+    .hero{border-radius:0;padding:96px 64px;}
+    .hero > *{max-width:1040px;margin-left:auto;margin-right:auto;width:100%;}
+    .hero .badge{font-size:14px;padding:8px 16px;margin-bottom:26px;}
+    .hero h1{font-size:60px;line-height:1.15;margin-bottom:22px;}
+    .hero .sub{font-size:21px;line-height:1.7;}
+    .hero .sub br{display:none;}
+    .hero .meta{margin-top:34px;font-size:14px;gap:12px;}
+    .hero .meta span{padding:7px 14px;}
+
+    .intro{background:transparent;border:none;box-shadow:none;border-radius:0;align-items:center;text-align:center;padding:96px 64px;}
+    .intro p{max-width:820px;margin:0 auto;font-size:28px;line-height:1.75;color:var(--ink);font-weight:500;}
+
+    section{margin-bottom:0;}
+    .sec-num{font-size:14px;letter-spacing:.3em;margin:0 auto 14px;max-width:1320px;width:100%;}
+    .sec-title{font-size:42px;line-height:1.25;margin:0 auto 44px;max-width:1320px;width:100%;}
+
+    .card{max-width:1320px;width:100%;margin:0 auto 18px;padding:32px 40px 36px;border-radius:20px;max-height:74vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#C9B89A transparent;}
+    .card::-webkit-scrollbar{width:6px;}
+    .card::-webkit-scrollbar-thumb{background:#C9B89A;border-radius:3px;}
+    .card p{font-size:17px;line-height:1.85;}
+    .card-subtitle{font-size:14px;}
+    .step-intro{font-size:14px;}
+
+    .explain-card{max-width:820px;margin:0 auto 24px;border-left:4px solid var(--accent-deep);border-radius:4px 20px 20px 4px;}
+    .explain-card p{font-size:16.5px;line-height:1.9;color:var(--ink-2);}
+
+    .market-box{max-width:720px;margin:0 auto 24px;padding:22px 28px;gap:18px;}
+    .market-status{font-size:18px;}
+    .market-detail{font-size:13px;}
+    .market-action{font-size:14px;}
+
+    .selection-explain{font-size:14px;padding:12px 18px;}
+    .score-row{gap:10px;margin-bottom:9px;}
+    .score-label{font-size:14px;width:52px;}
+    .score-val{font-size:11px;width:50px;}
+    .score-bar-bg{height:28px;border-radius:14px;}
+    .score-bar{border-radius:14px;font-size:11px;padding-right:10px;}
+    .score-tag{font-size:10.5px;padding:3px 7px;}
+    .score-note{font-size:14px;margin-top:12px;}
+
+    .alloc-bars{height:340px;gap:12px;}
+    .seg-label{font-size:12px;}
+    .alloc-date{font-size:12px;}
+    .alloc-legend{gap:6px 18px;margin-top:10px;}
+    .alloc-legend-item{font-size:13px;}
+    .alloc-legend-dot{width:12px;height:12px;}
+
+    .pq{font-size:17px;padding:14px 20px;}
+
+    .next-rebal{max-width:600px;margin:40px auto 0;font-size:14px;}
+    .next-rebal strong{font-size:17px;}
+
+    footer{
+      min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+      box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+      padding:80px 64px;font-size:14px;margin-top:0;border-top:none;color:var(--muted);
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="badge">Taylor · 投資觀念教學</span>
+  <h1>美股個股<br>量化動能策略</h1>
+  <p class="sub">不知道現在該買哪支股票？<br>這套策略從 S&amp;P 500 中篩選出當下跑最快的個股。</p>
+  <div class="meta">
+    <span>S&amp;P 500 選股</span>
+    <span>每週輪動</span>
+    <span>持有 4 檔</span>
+  </div>
+</header>
+
+<div class="intro">
+  <p>從美股最大的 500 家公司裡，量化計算每支股票的動能分數，<strong>集中持有跑最快的 4 檔，跑不動就換。</strong></p>
+</div>
+
+<!-- ============ STEP 01 ============ -->
+<section>
+  <span class="sec-num">STEP 01 — 策略概覽</span>
+  <h2 class="sec-title">怎麼從 500 支股票挑出 4 支？</h2>
+
+  <div class="card explain-card">
+    <p>用 90 天的價格走勢計算「調整斜率」（Adjusted Slope），衡量每支股票的動能強度。斜率越高代表趨勢越強、越穩定。</p>
+    <p><strong>為什麼只持有 4 檔？</strong>集中火力在動能最強的少數個股上，不分散到平庸的標的。空頭時自動清倉保留現金，不硬撐。</p>
+  </div>
+
+  <div class="market-box status-bull">
+    <div class="market-icon">🟢</div>
+    <div class="market-body">
+      <div class="market-label">市場狀態</div>
+      <div class="market-status">多頭（SPY 高於 200 日均線）</div>
+      <div class="market-detail">SPY 收盤 679.46　|　200MA 662.64</div>
+      <div class="market-action">策略正常運作，持有動能最強的個股</div>
+    </div>
+  </div>
+</section>
+
+<div class="arrow">↓</div>
+
+<!-- ============ STEP 02 ============ -->
+<section>
+  <span class="sec-num">STEP 02 — 動能排名 Top 10（截至 2026-04-08）</span>
+  <h2 class="sec-title">現在哪支股票跑最快？</h2>
+
+  <div class="card">
+    <div class="card-subtitle">依調整斜率（Adjusted Slope）排名，越高代表動能越強</div>
+    <div class="selection-explain">入選 = 動能排名前 4，納入配置<br>未入選 = 排名較低，暫不持有</div>
+
+    <div class="score-row">
+      <div class="score-rank">#1</div>
+      <div class="score-label">MRNA</div>
+      <div class="score-bar-bg"><div class="score-bar bar-in1" style="width:95%;"></div></div>
+      <div class="score-val">1.0274</div>
+      <div class="score-tag tag-in">入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#2</div>
+      <div class="score-label">TPL</div>
+      <div class="score-bar-bg"><div class="score-bar bar-in2" style="width:83%;"></div></div>
+      <div class="score-val">0.9641</div>
+      <div class="score-tag tag-in">入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#3</div>
+      <div class="score-label">WDC</div>
+      <div class="score-bar-bg"><div class="score-bar bar-in3" style="width:61%;"></div></div>
+      <div class="score-val">0.8442</div>
+      <div class="score-tag tag-in">入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#4</div>
+      <div class="score-label">LYB</div>
+      <div class="score-bar-bg"><div class="score-bar bar-in4" style="width:55%;"></div></div>
+      <div class="score-val">0.8128</div>
+      <div class="score-tag tag-in">入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#5</div>
+      <div class="score-label">DOW</div>
+      <div class="score-bar-bg"><div class="score-bar bar-out" style="width:53%;"></div></div>
+      <div class="score-val">0.8026</div>
+      <div class="score-tag tag-out">未入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#6</div>
+      <div class="score-label">GLW</div>
+      <div class="score-bar-bg"><div class="score-bar bar-out" style="width:49%;"></div></div>
+      <div class="score-val">0.7816</div>
+      <div class="score-tag tag-out">未入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#7</div>
+      <div class="score-label">CF</div>
+      <div class="score-bar-bg"><div class="score-bar bar-out" style="width:45%;"></div></div>
+      <div class="score-val">0.7578</div>
+      <div class="score-tag tag-out">未入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#8</div>
+      <div class="score-label">TER</div>
+      <div class="score-bar-bg"><div class="score-bar bar-out" style="width:44%;"></div></div>
+      <div class="score-val">0.7536</div>
+      <div class="score-tag tag-out">未入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#9</div>
+      <div class="score-label">FIX</div>
+      <div class="score-bar-bg"><div class="score-bar bar-out" style="width:15%;"></div></div>
+      <div class="score-val">0.5933</div>
+      <div class="score-tag tag-out">未入選</div>
+    </div>
+    <div class="score-row">
+      <div class="score-rank">#10</div>
+      <div class="score-label">OXY</div>
+      <div class="score-bar-bg"><div class="score-bar bar-out" style="width:10%;"></div></div>
+      <div class="score-val">0.5659</div>
+      <div class="score-tag tag-out">未入選</div>
+    </div>
+
+    <div class="score-note">動能前 4 名：<strong>MRNA</strong>、<strong>TPL</strong>、<strong>WDC</strong>、<strong>LYB</strong></div>
+  </div>
+</section>
+
+<div class="arrow">↓</div>
+
+<!-- ============ STEP 03 ============ -->
+<section>
+  <span class="sec-num">STEP 03 — 近 8 期持倉變化（2026-02-18 → 2026-04-08）</span>
+  <h2 class="sec-title">每次再平衡持股組成</h2>
+
+  <div class="card">
+    <div class="step-intro">每週三重新評估，根據動能排名調整持有的個股</div>
+
+    <div class="alloc-wrap">
+      <div class="alloc-bars">
+        <div class="alloc-col">
+          <div class="alloc-seg" style="height:79px;background:#8A5A30;"><span class="seg-label"><b>ALB</b><br>31%</span></div>
+          <div class="alloc-seg" style="height:63px;background:#A89870;"><span class="seg-label"><b>MU</b><br>24%</span></div>
+          <div class="alloc-seg" style="height:60px;background:#7A9868;"><span class="seg-label"><b>WDC</b><br>23%</span></div>
+          <div class="alloc-seg" style="height:57px;background:#6A8898;"><span class="seg-label"><b>STX</b><br>22%</span></div>
+        </div>        <div class="alloc-col">
+          <div class="alloc-seg" style="height:87px;background:#8A5A30;"><span class="seg-label"><b>ALB</b><br>33%</span></div>
+          <div class="alloc-seg" style="height:62px;background:#A89870;"><span class="seg-label"><b>MU</b><br>24%</span></div>
+          <div class="alloc-seg" style="height:57px;background:#7A9868;"><span class="seg-label"><b>WDC</b><br>22%</span></div>
+          <div class="alloc-seg" style="height:54px;background:#6A8898;"><span class="seg-label"><b>STX</b><br>21%</span></div>
+        </div>        <div class="alloc-col">
+          <div class="alloc-seg" style="height:71px;background:#B07840;"><span class="seg-label"><b>MRNA</b><br>27%</span></div>
+          <div class="alloc-seg" style="height:69px;background:#8A5A30;"><span class="seg-label"><b>ALB</b><br>26%</span></div>
+          <div class="alloc-seg" style="height:64px;background:#A89870;"><span class="seg-label"><b>MU</b><br>25%</span></div>
+          <div class="alloc-seg" style="height:56px;background:#7A9868;"><span class="seg-label"><b>WDC</b><br>22%</span></div>
+        </div>        <div class="alloc-col">
+          <div class="alloc-seg" style="height:68px;background:#8A5A30;"><span class="seg-label"><b>ALB</b><br>26%</span></div>
+          <div class="alloc-seg" style="height:66px;background:#A89870;"><span class="seg-label"><b>MU</b><br>25%</span></div>
+          <div class="alloc-seg" style="height:60px;background:#B07840;"><span class="seg-label"><b>MRNA</b><br>23%</span></div>
+          <div class="alloc-seg" style="height:57px;background:#7A9868;"><span class="seg-label"><b>WDC</b><br>22%</span></div>
+        </div>        <div class="alloc-col">
+          <div class="alloc-seg" style="height:70px;background:#A89870;"><span class="seg-label"><b>MU</b><br>27%</span></div>
+          <div class="alloc-seg" style="height:65px;background:#8A5A30;"><span class="seg-label"><b>ALB</b><br>25%</span></div>
+          <div class="alloc-seg" style="height:63px;background:#7A9868;"><span class="seg-label"><b>WDC</b><br>24%</span></div>
+          <div class="alloc-seg" style="height:54px;background:#B07840;"><span class="seg-label"><b>MRNA</b><br>21%</span></div>
+        </div>        <div class="alloc-col">
+          <div class="alloc-seg alloc-cash" style="height:260px;"><span class="seg-label">全現金</span></div>
+        </div>        <div class="alloc-col">
+          <div class="alloc-seg alloc-cash" style="height:260px;"><span class="seg-label">全現金</span></div>
+        </div>        <div class="alloc-col">
+          <div class="alloc-seg alloc-cash" style="height:260px;"><span class="seg-label">全現金</span></div>
+        </div>
+      </div>
+      <div class="alloc-dates">
+        <div class="alloc-date">02/18</div>
+        <div class="alloc-date">02/25</div>
+        <div class="alloc-date">03/04</div>
+        <div class="alloc-date">03/11</div>
+        <div class="alloc-date">03/18</div>
+        <div class="alloc-date">03/25</div>
+        <div class="alloc-date">04/01</div>
+        <div class="alloc-date">04/08</div>
+      </div>
+      <div class="alloc-legend">
+        <div class="alloc-legend-item"><div class="alloc-legend-dot" style="background:#8A5A30;"></div>ALB</div>
+        <div class="alloc-legend-item"><div class="alloc-legend-dot" style="background:#A89870;"></div>MU</div>
+        <div class="alloc-legend-item"><div class="alloc-legend-dot" style="background:#7A9868;"></div>WDC</div>
+        <div class="alloc-legend-item"><div class="alloc-legend-dot" style="background:#6A8898;"></div>STX</div>
+        <div class="alloc-legend-item"><div class="alloc-legend-dot" style="background:#B07840;"></div>MRNA</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--line);">
+      <p style="font-size:16.5px;line-height:1.9;margin-bottom:14px;"><strong>個股輪動的核心邏輯</strong></p>
+      <p>從 S&amp;P 500 成分股中，找出動能最強的 4 檔個股集中持有。每週三重新計算排名，強者續抱、弱者換掉。空頭時清空持倉，保留現金等待轉機。</p>
+      <div class="pq">不選產業、直接選個股。用動能找到市場裡跑最快的那幾匹馬。</div>
+    </div>
+  </div>
+</section>
+
+<div class="next-rebal">
+  下次再平衡預計：<strong>2026-04-15</strong><br>
+  屆時將重新計算動能排名並調整持股配置
+</div>
+
+<footer>
+  <p>本內容為投資觀念教育，不構成任何投資建議。</p>
+  <p>市場有風險，所有投資決策請依個人狀況審慎評估。</p>
+</footer>
+
+</div>
+
+</body>
+</html>
